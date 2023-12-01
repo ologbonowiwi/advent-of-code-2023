@@ -1,5 +1,37 @@
+fn get_parseable_position(line: &str) -> Option<usize> {
+  line.split("")
+    .position(|s| s.parse::<u32>().is_ok())
+}
+
+fn get_parseable_items(line: &str) -> Option<(u32, u32)> {
+  let first_position = get_parseable_position(line)?;
+  let reversed_line = line.chars().rev().collect::<String>();
+  let last_position = get_parseable_position(&reversed_line)?;
+
+  let reversed_line = reversed_line.split("").collect::<Vec<&str>>();
+  let line = line.split("").collect::<Vec<&str>>();
+
+  Some((line[first_position].parse::<u32>().unwrap(), reversed_line[last_position].parse::<u32>().unwrap()))
+}
+
 fn handle_input(input: &str) -> Option<u32> {
-  todo!()
+  let inputs = input.split("\n");
+
+  let sum = inputs
+    .into_iter()
+    .map(get_parseable_items)
+    .map(|values| {
+      match values {
+        Some((first, last)) => format!("{first}{last}").parse::<u32>().unwrap(),
+        _ => {
+          println!("Unexpected non Some(first, last)");
+          0
+        }
+      }
+    })
+    .reduce(|acc, cur| acc + cur)?;
+
+  return Some(sum);
 }
 
 fn main() {
