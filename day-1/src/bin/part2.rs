@@ -1,17 +1,17 @@
-const MAP: [(&str, u32); 9] = [
-  ("one", 1),
-  ("two", 2),
-  ("three", 3),
-  ("four", 4),
-  ("five", 5),
-  ("six", 6),
-  ("seven", 7),
-  ("eight", 8),
-  ("nine", 9)
-];
-
 fn get_positions<F>(line: &str, finder: F) -> Vec<(usize, u32)>
 where F: Fn(&str, &str) -> Option<usize> {
+  const MAP: [(&str, u32); 9] = [
+    ("one", 1),
+    ("two", 2),
+    ("three", 3),
+    ("four", 4),
+    ("five", 5),
+    ("six", 6),
+    ("seven", 7),
+    ("eight", 8),
+    ("nine", 9)
+  ];
+
   let key_positions = MAP.iter().filter_map(|(key, value)| finder(line, key).map(|pos| (pos, *value)));
   let value_positions = MAP.iter().filter_map(|(_, value)| finder(line, &value.to_string()).map(|pos| (pos, *value)));
 
