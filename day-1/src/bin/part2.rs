@@ -10,32 +10,39 @@ const MAP: [(&str, u32); 9] = [
   ("nine", 9)
 ];
 
-fn get_first_parsed_number(line: &str) -> Option<u32> {
-  let position = line.split("")
-    .position(|s| s.parse::<u32>().is_ok())?;
+fn get_positions(line: &str) -> Vec<(usize, u32)> {
+  MAP.iter().filter_map(|item| {
+    let (key, value) = item;
 
-  Some(line.split("").collect::<Vec<&str>>()[position].parse::<u32>().unwrap())
+    let position = match line.find(key) {
+      Some(pos) => Some(pos),
+      None => line.find(&value.to_string())
+    };
+
+    Some((position?, value.to_owned()))
+  })
+  .collect()
 }
 
-fn get_first_item(line: &str) -> Option<u32> {
-  // let result = MAP.iter().find_map(|item| {
-  //   let (key, value) = item;
+fn get_first_item(line: &str) -> u32 {
+  let mut positions: Vec<(usize, u32)> = get_positions(line);
 
-  //   let pos = line.find(|s|) 
-  // });
+  positions.sort_by(|a, b| a.0.cmp(&b.0));
 
-  get_first_parsed_number(line)
+  return positions[0].1;
 }
 
-fn get_last_item(line: &str) -> Option<u32> {
-  let line = line.chars().rev().collect::<String>();
+fn get_last_item(line: &str) -> u32 {
+  let mut positions: Vec<(usize, u32)> = get_positions(line);
 
-  get_first_parsed_number(&line)
+  positions.sort_by(|a, b| b.0.cmp(&a.0));
+
+  return positions[0].1;
 }
 
 fn get_parseable_items(line: &str) -> Option<(u32, u32)> {
-  let first = get_first_item(line)?;
-  let last = get_last_item(line)?;
+  let first = get_first_item(line);
+  let last = get_last_item(line);
 
   Some((first, last))
 }
@@ -122,5 +129,5 @@ xtwone3four
 4nineeightseven2
 zoneight234
 7pqrstsixteen",
-    142);
+    281);
 }
