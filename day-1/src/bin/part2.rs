@@ -10,18 +10,22 @@ const MAP: [(&str, u32); 9] = [
   ("nine", 9)
 ];
 
+fn get_r_positions(line: &str) -> Vec<(usize, u32)> {
+  let key_positions = MAP.iter().filter_map(|(key, value)| line.rfind(key).map(|pos| (pos, *value)));
+  let value_positions = MAP.iter().filter_map(|(_, value)| line.rfind(&value.to_string()).map(|pos| (pos, *value)));
+
+  let positions: Vec<(usize, u32)> = key_positions.chain(value_positions).collect();
+
+  positions
+}
+
 fn get_positions(line: &str) -> Vec<(usize, u32)> {
-  MAP.iter().filter_map(|item| {
-    let (key, value) = item;
+  let key_positions = MAP.iter().filter_map(|(key, value)| line.find(key).map(|pos| (pos, *value)));
+  let value_positions = MAP.iter().filter_map(|(_, value)| line.find(&value.to_string()).map(|pos| (pos, *value)));
 
-    let position = match line.find(key) {
-      Some(pos) => Some(pos),
-      None => line.find(&value.to_string())
-    };
+  let positions: Vec<(usize, u32)> = key_positions.chain(value_positions).collect();
 
-    Some((position?, value.to_owned()))
-  })
-  .collect()
+  positions
 }
 
 fn get_first_item(line: &str) -> u32 {
@@ -33,7 +37,7 @@ fn get_first_item(line: &str) -> u32 {
 }
 
 fn get_last_item(line: &str) -> u32 {
-  let mut positions: Vec<(usize, u32)> = get_positions(line);
+  let mut positions: Vec<(usize, u32)> = get_r_positions(line);
 
   positions.sort_by(|a, b| b.0.cmp(&a.0));
 
@@ -120,6 +124,10 @@ treb7uchet",
 
   test_case!(r7pqrstsixteen, "7pqrstsixteen", 76);
 
+  test_case!(eighthree, "eighthree", 83);
+
+  test_case!(sevenine, "sevenine", 79);
+
   test_case!(
     multiple_lines2,
     r"two1nine
@@ -130,4 +138,6 @@ xtwone3four
 zoneight234
 7pqrstsixteen",
     281);
+
+  test_case!(input, include_str!("./input.txt"), 53855);
 }
