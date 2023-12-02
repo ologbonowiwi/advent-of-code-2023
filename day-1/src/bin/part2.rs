@@ -10,26 +10,16 @@ const MAP: [(&str, u32); 9] = [
   ("nine", 9)
 ];
 
-fn get_r_positions(line: &str) -> Vec<(usize, u32)> {
-  let key_positions = MAP.iter().filter_map(|(key, value)| line.rfind(key).map(|pos| (pos, *value)));
-  let value_positions = MAP.iter().filter_map(|(_, value)| line.rfind(&value.to_string()).map(|pos| (pos, *value)));
+fn get_positions<F>(line: &str, finder: F) -> Vec<(usize, u32)>
+where F: Fn(&str, &str) -> Option<usize> {
+  let key_positions = MAP.iter().filter_map(|(key, value)| finder(line, key).map(|pos| (pos, *value)));
+  let value_positions = MAP.iter().filter_map(|(_, value)| finder(line, &value.to_string()).map(|pos| (pos, *value)));
 
-  let positions: Vec<(usize, u32)> = key_positions.chain(value_positions).collect();
-
-  positions
-}
-
-fn get_positions(line: &str) -> Vec<(usize, u32)> {
-  let key_positions = MAP.iter().filter_map(|(key, value)| line.find(key).map(|pos| (pos, *value)));
-  let value_positions = MAP.iter().filter_map(|(_, value)| line.find(&value.to_string()).map(|pos| (pos, *value)));
-
-  let positions: Vec<(usize, u32)> = key_positions.chain(value_positions).collect();
-
-  positions
+  key_positions.chain(value_positions).collect()
 }
 
 fn get_first_item(line: &str) -> u32 {
-  let mut positions: Vec<(usize, u32)> = get_positions(line);
+  let mut positions: Vec<(usize, u32)> = get_positions(line, |s, p| s.find(p));
 
   positions.sort_by(|a, b| a.0.cmp(&b.0));
 
@@ -37,7 +27,7 @@ fn get_first_item(line: &str) -> u32 {
 }
 
 fn get_last_item(line: &str) -> u32 {
-  let mut positions: Vec<(usize, u32)> = get_r_positions(line);
+  let mut positions: Vec<(usize, u32)> = get_positions(line, |s, p| s.rfind(p));
 
   positions.sort_by(|a, b| b.0.cmp(&a.0));
 
